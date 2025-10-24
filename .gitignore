@@ -7,6 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Node modules and build output
 node_modules
 dist
 dist-ssr
@@ -26,3 +30,61 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Dependency directories
+bower_components
+jspm_packages/
+web_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directories
+.npm
+.eslintcache
+.stylelintcache
+
+# REPL and Yarn cache
+.node_repl_history
+.yarn-integrity
+
+# dotenv environment variable files
+.env.*
+!.env.example
+
+# Framework build outputs
+.next
+out
+.nuxt
+.vuepress/dist
+.temp
+.cache
+.svelte-kit/
+**/.vitepress/dist
+**/.vitepress/cache
+.docusaurus
+
+# Serverless and Firebase
+.serverless/
+.firebase/
+.dynamodb/
+
+# Miscellaneous
+.lock-wscript
+build/Release
+.fusebox/
+.tern-port
+.vscode-test
+
+# Yarn v3
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Vite logs files
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
