@@ -12,18 +12,19 @@ import { supabase } from "@/integrations/supabase/client";
 
 const queryClient = new QueryClient();
 
+// 🔒 Protected Route Wrapper
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
-    // Check if the user is logged in
+    // Check if user is logged in (session)
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setLoading(false);
     });
 
-    // Listen for auth changes (login/logout)
+    // Listen for login/logout changes
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
@@ -35,13 +36,13 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
+      <div className="min-h-screen flex items-center justify-center text-white text-lg">
         Loading...
       </div>
     );
   }
 
-  // If not logged in, redirect to home
+  // Redirect if not logged in
   if (!session) {
     return <Navigate to="/" replace />;
   }
@@ -49,6 +50,7 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
   return children;
 }
 
+// 🌐 App Component
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -56,11 +58,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* Public routes */}
+          {/* Public Routes */}
           <Route path="/" element={<Index />} />
           <Route path="/story/:id" element={<StoryDetail />} />
 
-          {/* Protected admin route */}
+          {/* Protected Admin Route */}
           <Route
             path="/admin"
             element={
@@ -70,7 +72,7 @@ const App = () => (
             }
           />
 
-          {/* 404 fallback */}
+          {/* 404 Fallback */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
