@@ -57,10 +57,11 @@ const Admin = () => {
 
   useEffect(() => {
     if (!authLoading && user && !isAdmin) {
+      console.log("Admin check failed:", { userId: user.id, isAdmin, authLoading });
       navigate("/");
       toast({
         title: "Aksesi refuzuar / Access denied",
-        description: "Nuk keni leje për të aksesuar këtë faqe / You don't have permission to access this page",
+        description: `User ID: ${user.id}. Nuk keni leje për të aksesuar këtë faqe / You don't have permission to access this page`,
         variant: "destructive",
       });
     }

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Clock, Eye, Heart, Search } from "lucide-react";
+import { Clock, Eye, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 
@@ -17,39 +17,40 @@ const FeaturedStories = () => {
 
   const fetchStories = async () => {
     setLoading(true);
-    const { data } = await supabase
+
+    const { data, error } = await supabase
       .from("stories")
       .select(`
-        *,
-        categories(name_sq, name_en),
-        profiles(full_name),
-        story_likes(count)
+        id,
+        title_sq,
+        title_en,
+        content_sq,
+        content_en,
+        image_url,
+        published_at,
+        views,
+        status,
+        read_time_minutes,
+        categories(id, name_sq, name_en)
       `)
       .eq("status", "published")
       .order("published_at", { ascending: false })
       .limit(6);
 
-    if (data) {
-      // Fetch like counts for each story
-      const storiesWithLikes = await Promise.all(
-        data.map(async (story) => {
-          const { count } = await supabase
-            .from("story_likes")
-            .select("*", { count: "exact", head: true })
-            .eq("story_id", story.id);
-          
-          return { ...story, like_count: count || 0 };
-        })
-      );
-      setStories(storiesWithLikes);
+    if (error) {
+      console.error("Error fetching stories:", error);
+      setStories([]);
+    } else {
+      setStories(data || []);
     }
+
     setLoading(false);
   };
 
   const filteredStories = stories.filter((story) =>
-    story.title_sq.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    story.title_en.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    story.excerpt_sq?.toLowerCase().includes(searchTerm.toLowerCase())
+    story.title_sq?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    story.title_en?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    story.content_sq?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -113,9 +114,11 @@ const FeaturedStories = () => {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
-                      <Badge className="absolute top-4 left-4 bg-primary/90 backdrop-blur-sm">
-                        {story.categories?.name_sq}
-                      </Badge>
+                      {story.categories?.name_sq && (
+                        <Badge className="absolute top-4 left-4 bg-primary/90 backdrop-blur-sm">
+                          {story.categories.name_sq}
+                        </Badge>
+                      )}
                     </div>
                   )}
 
@@ -128,7 +131,7 @@ const FeaturedStories = () => {
                       {story.title_en}
                     </p>
                     <p className="text-muted-foreground mb-4 line-clamp-3">
-                      {story.excerpt_sq || story.content_sq.substring(0, 150)}...
+                      {story.content_sq?.substring(0, 150)}...
                     </p>
 
                     {/* Stats */}
@@ -137,10 +140,6 @@ const FeaturedStories = () => {
                         <span className="flex items-center gap-1">
                           <Eye className="h-4 w-4" />
                           {story.views?.toLocaleString() || 0}
-                        </span>
-                        <span className="flex items-center gap-1 text-accent">
-                          <Heart className="h-4 w-4" />
-                          {story.like_count || 0}
                         </span>
                       </div>
                       {story.read_time_minutes && (
