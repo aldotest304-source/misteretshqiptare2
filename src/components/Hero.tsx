@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-mystery.jpg";
+import { useNavigate } from "react-router-dom"; // ✅ Added navigation import
 
 const Hero = () => {
+  const navigate = useNavigate(); // ✅ Initialize navigation
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
@@ -29,16 +32,23 @@ const Hero = () => {
         <p className="text-lg text-muted-foreground/80 mb-8 max-w-2xl mx-auto">
           Discover the truth behind urban legends, mysterious stories and global curiosities
         </p>
+
+        {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button size="lg" className="bg-gradient-mystery hover:shadow-glow transition-all">
+          <Button
+            size="lg"
+            className="bg-gradient-mystery hover:shadow-glow transition-all"
+            onClick={() => navigate("/stories")} // ✅ Redirect to stories page
+          >
             Eksploro Historitë
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
-          <Button 
-            size="lg" 
-            variant="outline" 
+
+          <Button
+            size="lg"
+            variant="outline"
             className="border-primary text-primary hover:bg-primary/10"
-            onClick={() => window.location.href = "/submit"}
+            onClick={() => navigate("/submit")} // Optional: redirect to submit page if you have one
           >
             Dërgo Historinë Tënde
           </Button>

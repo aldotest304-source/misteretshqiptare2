@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { supabase } from "@/supabaseClient"
+import Stories from "@/pages/Stories";
+
 
 // ✅ Pages
 import Index from "./pages/Index"
@@ -83,6 +85,9 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+
+<Route path="/stories" element={<Stories />} />
+
 
           {/* ✅ Redirect plain /admin to dashboard */}
           <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />

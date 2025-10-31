@@ -36,14 +36,11 @@ const StoryDetail = () => {
     }
   }, [id, user]);
 
+  // ✅ Simplified query to avoid invalid joins
   const fetchStory = async () => {
     const { data, error } = await supabase
       .from("stories")
-      .select(`
-        *,
-        categories(name_sq, name_en),
-        profiles(full_name, avatar_url)
-      `)
+      .select("*")
       .eq("id", id)
       .single();
 
@@ -67,7 +64,7 @@ const StoryDetail = () => {
       .from("story_likes")
       .select("*", { count: "exact", head: true })
       .eq("story_id", id);
-    
+
     setLikeCount(count || 0);
   };
 
@@ -78,17 +75,14 @@ const StoryDetail = () => {
       .eq("story_id", id)
       .eq("user_id", user?.id)
       .maybeSingle();
-    
+
     setHasLiked(!!data);
   };
 
   const fetchComments = async () => {
     const { data } = await supabase
       .from("comments")
-      .select(`
-        *,
-        profiles(full_name, avatar_url)
-      `)
+      .select("*")
       .eq("story_id", id)
       .eq("status", "approved")
       .order("created_at", { ascending: false });
@@ -125,7 +119,7 @@ const StoryDetail = () => {
 
   const submitComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       navigate("/auth");
       return;
@@ -196,7 +190,7 @@ const StoryDetail = () => {
           {/* Header */}
           <div className="mb-8">
             <Badge className="mb-4 bg-primary/90">
-              {story.categories?.name_sq}
+              {story.category_name || "Pa kategori"}
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
               {story.title_sq}
@@ -205,11 +199,10 @@ const StoryDetail = () => {
               {story.title_en}
             </p>
 
-            {/* Meta info */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-2">
                 <UserIcon className="h-4 w-4" />
-                {story.profiles?.full_name || "Anonymous"}
+                {story.author_name || "Anonymous"}
               </span>
               <Separator orientation="vertical" className="h-4" />
               <span className="flex items-center gap-2">
@@ -229,7 +222,6 @@ const StoryDetail = () => {
               )}
             </div>
 
-            {/* Stats */}
             <div className="flex items-center gap-6 mt-6">
               <Button
                 variant="outline"
@@ -237,9 +229,7 @@ const StoryDetail = () => {
                 onClick={toggleLike}
                 className={hasLiked ? "border-accent text-accent" : ""}
               >
-                <Heart
-                  className={`h-4 w-4 mr-2 ${hasLiked ? "fill-current" : ""}`}
-                />
+                <Heart className={`h-4 w-4 mr-2 ${hasLiked ? "fill-current" : ""}`} />
                 {likeCount}
               </Button>
               <span className="flex items-center gap-2 text-muted-foreground">
@@ -249,7 +239,6 @@ const StoryDetail = () => {
             </div>
           </div>
 
-          {/* Featured Image */}
           {story.image_url && (
             <div className="mb-12 rounded-xl overflow-hidden">
               <img
@@ -260,27 +249,24 @@ const StoryDetail = () => {
             </div>
           )}
 
-          {/* Content */}
           <div className="prose prose-invert max-w-none mb-12">
             <div className="text-lg leading-relaxed whitespace-pre-wrap">
               {story.content_sq}
             </div>
-            
+
             <Separator className="my-8" />
-            
+
             <div className="text-lg leading-relaxed whitespace-pre-wrap text-muted-foreground/80">
               <p className="text-sm font-semibold mb-4">English Version:</p>
               {story.content_en}
             </div>
           </div>
 
-          {/* Comments Section */}
           <div className="mt-16">
             <h2 className="text-2xl font-bold mb-6">
               Komente / Comments ({comments.length})
             </h2>
 
-            {/* Comment Form */}
             {user ? (
               <Card className="p-6 mb-8 bg-card border-border">
                 <form onSubmit={submitComment}>
@@ -314,7 +300,6 @@ const StoryDetail = () => {
               </Card>
             )}
 
-            {/* Comments List */}
             <div className="space-y-4">
               {comments.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">
@@ -326,13 +311,13 @@ const StoryDetail = () => {
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-mystery flex items-center justify-center">
                         <span className="text-sm font-bold text-primary-foreground">
-                          {comment.profiles?.full_name?.[0] || "?"}
+                          {comment.full_name?.[0] || "?"}
                         </span>
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="font-semibold">
-                            {comment.profiles?.full_name || "Anonymous"}
+                            {comment.full_name || "Anonymous"}
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(comment.created_at), {
