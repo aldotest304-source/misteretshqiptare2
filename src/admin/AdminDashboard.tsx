@@ -136,7 +136,7 @@ export default function AdminDashboard() {
     const allowed = [
       "Legjenda Urbane",
       "Historitë Tuaja",
-      "Kuriozitete nga Bota",
+      "Kuriozitete Globale",
     ]
 
     const filtered = data.filter((cat) => allowed.includes(cat.name_sq))

@@ -26,15 +26,19 @@ const StoryDetail = () => {
   const [submittingComment, setSubmittingComment] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      fetchStory();
-      fetchComments();
-      incrementViews();
-      if (user) {
-        checkIfLiked();
-      }
-    }
-  }, [id, user]);
+  if (!id) return;
+
+  fetchStory();
+  fetchComments();
+
+  // Only increment once per mount, not when user changes
+  incrementViews();
+
+  if (user) {
+    checkIfLiked();
+  }
+}, [id]);
+
 
   // ✅ Simplified query to avoid invalid joins
   const fetchStory = async () => {
